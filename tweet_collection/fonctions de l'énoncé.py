@@ -16,7 +16,7 @@ def collect():
 #fonction donnée dans les consignes
 def collect_by_user(user_id):
     connexion = connect.twitter_setup()
-    statuses = connexion.user_timeline(id = user_id, count = 20)
+    statuses = connexion.user_timeline(id = user_id, count = 1)
     for status in statuses:
         print(status.text)
     return statuses
@@ -26,6 +26,11 @@ def collect_by_user(user_id):
 # user_id de Donald Trump 25073877
 
 
+# A[0].entities['hashtags']
+#petite prise de note sur les statuses
+#statuses=liste, qui sont elles-même des dictionnaires, qui sont eux-même des dictionnaires
+
+"""
 #fonction donnée dans les consignes
 
 from tweepy.streaming import StreamListener
@@ -53,3 +58,4 @@ def collect_by_streaming():
     stream=tweepy.Stream(auth = connexion.auth, listener=listener)
     stream.filter(track=['Emmanuel Macron'])
 
+"""
