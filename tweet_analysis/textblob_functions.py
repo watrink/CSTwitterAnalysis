@@ -9,13 +9,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from textblob import TextBlob
 from textblob import Word
+from textblob.sentiments import NaiveBayesAnalyzer
 
 
 #il faut d'abord collecter les tweets
 
 def collect_by_user(user_id):
     connexion = connect.twitter_setup()
-    statuses = connexion.user_timeline(id = user_id, count = 1)
+    statuses = connexion.user_timeline(id = user_id, count = 10)
     for status in statuses:
         print(status.text)
     return statuses
@@ -35,8 +36,7 @@ def collect_to_pandas_dataframe():
 
 
 
-def get_text_only(data, texte_initial):
-   """fonction qui transforme les textes des tweets en string """
+def get_text_only(data, texte_initial): #fonction qui transforme les textes des tweets en string
     array=np.array(pd.DataFrame(data,columns=['tweet_textual_content']))
     for tweet in array:
         texte_initial+=tweet
@@ -45,8 +45,7 @@ def get_text_only(data, texte_initial):
 
 
 
-def extract_voc_tweet(texte):
-   """fonction qui permet d'extraire le vocabulaire le plus important et revelateur d'un tweet. la fonction renvoie tous les mots utilisés (sauf les pronoms, conjonction de coordiation et autre petits mots outils et ainsi qu eleur nombre. A partir de ça nous pensions faire des comparaisons et des analyses de sentiments """
+def extract_voc_tweet(texte): #fonction qui permet d'extraire le vocabulaire le plus important et revelateur d'un tweet. la fonction renvoie tous les mots utilisés (sauf les pronoms, conjonction de coordiation et autre petits mots outils et ainsi qu eleur nombre. A partir de ça nous pensions faire des comparaisons et des analyses de sentiments
     voc={}
     content=TextBlob(texte)
     words=content.tags
@@ -72,3 +71,34 @@ data=collect_to_pandas_dataframe()
 texte=get_text_only(data,'')
 voc=extract_voc_tweet(texte)
 """
+
+### Analyse des sentiments
+
+def analyse_tweet(data):
+   array=np.array(pd.DataFrame(data,columns=['tweet_textual_content']))
+   pos_tweets=[]
+   neu_tweets=[]
+   neg_tweets=[]
+   for tweet in array:        #tris des tweets en fonction de leur 'sentiment'
+      text=tweet[0]
+      blob = TextBlob(text, analyzer=NaiveBayesAnalyzer())
+      if blob.sentiment[0]=='pos':
+         pos_tweets.append(blob)
+      if blob.sentiment[0]=='neu':
+         neu_tweets.append(blob)
+      if blob.sentiment[0]=='neg':
+         neg_tweets.append(blob)
+
+   print("Percentage of positive tweets: {}%".format(len(pos_tweets)*100/len(data['tweet_textual_content'])))
+   print("Percentage of neutral tweets: {}%".format(len(neu_tweets)*100/len(data['tweet_textual_content'])))
+   print("Percentage de negative tweets: {}%".format(len(neg_tweets)*100/len(data['tweet_textual_content'])))
+
+"""
+# tests
+data=collect_to_pandas_dataframe()
+analyse_tweet(data)
+
+
+# les testes renvoient des choses assez bizarre parce que le sentiment de "I hate you" est 'pos'
+"""
+
