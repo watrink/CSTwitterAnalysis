@@ -35,6 +35,8 @@ def collect_to_pandas_dataframe():
    return data
 
 
+### Analyse des récurrence des mots
+
 
 def get_text_only(data, texte_initial): #fonction qui transforme les textes des tweets en string
     array=np.array(pd.DataFrame(data,columns=['tweet_textual_content']))
@@ -51,7 +53,7 @@ def extract_voc_tweet(texte): #fonction qui permet d'extraire le vocabulaire le 
     words=content.tags
     class_to_supress=['C','W','P','I','D','R']
     for word in words:                #il  nous faut enlever certains mots, 1) ceux qui contiennent https etc
-        if (word[0][:3]!='htt') and (len(word[0])>2) and (word[1][0] not in class_to_supress):
+        if (word[0][:3]!='htt') and (len(word[0])>2) and (word[1][0] not in class_to_supress) and (word[0]!='/'):
             if word[1][0]=='V':
                 word_only=Word(word[0]).lemmatize('v')
                 #if not (word[0] in ['be','have','do','go','make','will','want']):
@@ -65,6 +67,69 @@ def extract_voc_tweet(texte): #fonction qui permet d'extraire le vocabulaire le 
     return voc
 
 
+#petite fonction pour comparer Trump et Obama
+
+
+def collect_to_pandas_dataframe_user(user):
+   connexion = connect.twitter_setup()
+   tweets = collect_by_user(user)
+   data = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['tweet_textual_content'])
+   data['len']=np.array([len(tweet.text) for tweet in tweets])
+   data['ID']=np.array([tweet.id for tweet in tweets])
+   data['Date']=np.array([tweet.created_at for tweet in tweets])
+   data['Source']=np.array([tweet.source for tweet in tweets])
+   data['Likes']=np.array([tweet.favorite_count for tweet in tweets])
+   data['RTs']=np.array([tweet.retweet_count for tweet in tweets])
+   return data
+
+
+def comparaison_obama_trump():
+    data_obama=collect_to_pandas_dataframe_user(813286)
+    voc_obama=extract_voc_tweet(get_text_only(data_obama,''))
+    data_trump=collect_to_pandas_dataframe_user(25073877)
+    voc_trump=extract_voc_tweet(get_text_only(data_trump,''))
+    mots={}
+    for i in voc_obama.keys():
+        mots[i]=[voc_obama[i],0]
+    for i in voc_trump.keys():
+        if i not in mots.keys():
+            mots[i]=[0,voc_trump[i]]
+        else:
+            mots[i]=[mots[i][0],voc_trump[i]]
+    return mots
+
+
+def affichage_comparatif(mots):
+
+    liste_keys=mots.keys()
+    liste_mots_interessants=[]
+    for key in liste_keys:
+        if mots[key][0]+mots[key][0]>10:
+            liste_mots_interessants.append([key,mots[key][0],mot[key][1]])
+    nb_mots=len(liste_mots_interessants)
+    X=np.zeros((nb_mots))
+    Y_Trump=np.zeros((nb_mots))
+    Y_Obama=np.zeros((nb_mots))
+    for i in range(nb_mots):
+        X[i]=liste_mots_interessants[i][0]
+        Y_Trump=liste_mots_interessants[i][1]
+        Y_Obama=liste_mots_interessants[i][2]
+    plt.plot(X,Y_Trump)             # A MODIFIER CAR LE PLOT NEST PAS CORRECTE POUR DES MOTS
+    plt.plot(X,Y_Obama)
+    plt.show()
+
+"""
+#tests:
+mots=comparaison_obama_trump()
+affichage_comparatif(mots)
+"""
+
+
+
+
+
+
+
 """
 # tests
 data=collect_to_pandas_dataframe()
@@ -73,6 +138,7 @@ voc=extract_voc_tweet(texte)
 """
 
 ### Analyse des sentiments
+
 
 def analyse_tweet(data):
    array=np.array(pd.DataFrame(data,columns=['tweet_textual_content']))
