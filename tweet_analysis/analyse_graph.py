@@ -32,10 +32,10 @@ def collect_to_pandas_dataframe():         #keyword = "@EmmanuelMacron" par exem
    data['RTs']=np.array([tweet.retweet_count for tweet in tweets])
    return data
 
-
 #proposition de l'éconcé pour afficher les likes/retweet
 
 data = collect_to_pandas_dataframe()
+"""
 tfav = pd.Series(data=data['Likes'].values, index=data['Date'])
 tret = pd.Series(data=data['RTs'].values, index=data['Date'])
 
@@ -60,11 +60,11 @@ tret_Macron.plot(figsize=(16,4), label="Retweets Macron", legend=True)
 tret_Philippe.plot(figsize=(16,4), label="Retweets Philippe", legend=True)
 
 plt.show()
+"""
+
 
 
 # essais fait par Maxime
-
-
 
 def stat_len_et_likes(data):
     tfav = pd.Series(data=data['len'].values, index=data['Date'])
