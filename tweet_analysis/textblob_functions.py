@@ -99,7 +99,7 @@ def comparaison_obama_trump():
     return mots
 
 
-def affichage_comparatif(mots):
+def affichage_comparatif(mots):             #affichage comparatifs des emploi de certains mots par Trump et Obama
 
     liste_keys=mots.keys()
     liste_mots_interessants=[]
